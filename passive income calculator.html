@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passive Income Calculator</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="C:\Users\LENOVO\Desktop\Passive Income Website\calculator.ico">
+    <link rel="icon" type="image/x-icon" href="C:\Users\LENOVO\Desktop\Passive Income Website\calculator.ico">    <style>
+        /* General Styles */
+        body.dark-bg {
+            background-color: #0f0f0f;
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif; /* Futuristic font, assumed available */
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr; /* Left ad, main content, right ad */
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .main-content {
+            grid-column: 2 / 3; /* Center column for main content */
+        }
+
+        /* Header */
+        header h1 {
+            text-align: center;
+            font-size: 2.5em;
+            text-shadow: 0 0 10px #1fd655, 0 0 20px #1fd655, 0 0 40px #1fd655;
+            animation: glowPulse 2s infinite alternate;
+        }
+
+        /* Form Styles */
+        form {
+            display: grid;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        label {
+            font-size: 1.2em;
+            text-shadow: 0 0 5px #1fd655, 0 0 10px #1fd655;
+        }
+        input[type="number"] {
+            padding: 10px;
+            font-size: 1em;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: 2px solid #1fd655;
+            border-radius: 5px;
+box-shadow: 0 0 10px #1fd655;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        input[type="number"]:hover,
+        input[type="number"]:focus {
+            box-shadow: 0 0 20px #1fd655, 0 0 30px #1fd655;
+            transform: scale(1.02);
+        }
+
+        /* Currency Dropdown */
+        .currency-select {
+            position: relative;
+        }
+        #currency-button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: 2px solid #1fd655;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 10px #1fd655;
+            transition: box-shadow 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
+        }
+        #currency-button:hover {
+            box-shadow: 0 0 20px #1fd655, 0 0 30px #1fd655;
+            background-color: #2a2a2a;
+            transform: scale(1.05);
+        }
+        #currency-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: #1a1a1a;
+            border: 2px solid #1fd655;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #1fd655;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        #currency-dropdown.open {
+            max-height: 300px;
+        }
+        #currency-search {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: none;
+            border-bottom: 1px solid #1fd655;
+            box-shadow: 0 0 5px #1fd655;
+        }
+        #currency-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        #currency-list li {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, text-shadow 0.3s ease;
+        }
+        #currency-list li:hover {
+            background-color: #2a2a2a;
+            text-shadow: 0 0 10px #ff00ff; /* Magenta hover effect */
+        }
+
+        /* Calculate Button */
+        #calculate-button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #1fd655;
+            color: #0f0f0f;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 10px #1fd655, 0 0 20px #1fd655;
+            transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+        }
+        #calculate-button:hover {
+            box-shadow: 0 0 20px #1fd655, 0 0 30px #ff00ff; /* Magenta accent */
+            transform: scale(1.05);
+            background-color: #2aff66;
+        }
+
+        /* Result Display */
+        #result {
+            text-align: center;
+            font-size: 1.5em;
+            margin-top: 20px;
+            text-shadow: 0 0 10px #1fd655, 0 0 20px #1fd655;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #result.show {
+            opacity: 1;
+        }
+
+        /* Explanation Section */
+        .explanation {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .explanation h2 {
+            font-size: 2em;
+            text-shadow: 0 0 10px #1fd655, 0 0 20px #1fd655;
+        }
+        .explanation p {
+            font-size: 1.1em;
+        }
+        .highlight {
+            color: #1fd655;
+            text-shadow: 0 0 5px #1fd655, 0 0 10px #1fd655;
+            font-weight: bold;
+        }
+
+        /* Ad Space */
+        .ad-space {
+            padding: 20px;
+            border: 2px solid #1fd655;
+            text-align: center;
+            font-size: 1.2em;
+            box-shadow: 0 0 10px #1fd655, 0 0 20px #1fd655;
+            background-color: #1a1a1a;
+            height: 600px; /* Fixed height for vertical banners */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: box-shadow 0.3s ease;
+        }
+        .ad-space:hover {
+            box-shadow: 0 0 20px #1fd655, 0 0 30px #ff00ff;
+        }
+        .ad-left {
+            grid-column: 1 / 2;
+        }
+        .ad-right {
+            grid-column: 3 / 4;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.8em;
+            text-shadow: 0 0 5px #1fd655;
+            grid-column: 1 / 4; /* Span full width */
+        }
+
+        /* Background Animations */
+        .bg-animations {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .bg-animation {
+            position: absolute;
+            background-color: #1fd655;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #1fd655, 0 0 20px #1fd655, 0 0 30px #1fd655;
+            animation: moveAndGlow 10s infinite ease-in-out;
+        }
+        .bg-animation:nth-child(1) {
+            width: 15px;
+            height: 15px;
+            top: 10%;
+            left: 20%;
+            animation-duration: 15s;
+        }
+        .bg-animation:nth-child(2) {
+            width: 10px;
+            height: 10px;
+            top: 30%;
+            left: 50%;
+            animation-duration: 20s;
+            animation-delay: 2s;
+        }
+        .bg-animation:nth-child(3) {
+            width: 12px;
+            height: 12px;
+            top: 50%;
+            left: 70%;
+            animation-duration: 25s;
+            animation-delay: 4s;
+        }
+        .bg-animation:nth-child(4) {
+            width: 8px;
+            height: 8px;
+            top: 70%;
+            left: 30%;
+            animation-duration: 18s;
+            animation-delay: 6s;
+        }
+        .bg-animation:nth-child(5) {
+            width: 14px;
+            height: 14px;
+            top: 90%;
+            left: 80%;
+            animation-duration: 22s;
+            animation-delay: 8s;
+        }
+        @keyframes moveAndGlow {
+            0% {
+                transform: translate(0, 0) scale(1);
+                box-shadow: 0 0 10px #1fd655;
+            }
+            25% {
+                transform: translate(50vw, 50vh) scale(1.2);
+                box-shadow: 0 0 20px #ff00ff; /* Magenta glow */
+            }
+            50% {
+                transform: translate(80vw, 20vh) scale(0.8);
+                box-shadow: 0 0 15px #1fd655;
+            }
+            75% {
+                transform: translate(20vw, 70vh) scale(1.1);
+                box-shadow: 0 0 25px #ff00ff;
+            }
+            100% {
+                transform: translate(0, 0) scale(1);
+                box-shadow: 0 0 10px #1fd655;
+            }
+        }
+        @keyframes glowPulse {
+            0% {
+                text-shadow: 0 0 10px #1fd655, 0 0 20px #1fd655;
+            }
+            100% {
+                text-shadow: 0 0 15px #1fd655, 0 0 30px #1fd655, 0 0 50px #ff00ff;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr; /* Stack everything on smaller screens */
+            }
+            .main-content, .ad-left, .ad-right, footer {
+                grid-column: 1 / 2;
+            }
+            .ad-space {
+                height: 200px; /* Shorter horizontal banners on mobile */
+                margin: 20px 0;
+            }
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            form {
+                max-width: 100%;
+            }
+            #result {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body class="dark-bg">
+    <!-- Background Animations -->
+    <div class="bg-animations">
+        <div class="bg-animation"></div>
+        <div class="bg-animation"></div>
+        <div class="bg-animation"></div>
+        <div class="bg-animation"></div>
+        <div class="bg-animation"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Left Ad Space -->
+        <div class="ad-space ad-left">Advertisement Left</div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <header>
+                <h1>Passive Income Calculator</h1>
+            </header>
+            <main>
+                <!-- About Section Moved Above Calculator -->
+                <section class="explanation">
+                    <h2>About the Calculator</h2>
+                    <p>This <span class="highlight">Passive Income Calculator</span> helps you determine how much capital you need to invest to achieve your desired monthly passive income, based on your expected annual yield. Passive income is earnings derived from investments or business activities in which you are not actively involved.</p>
+                    <p>Simply input your target monthly income and the annual yield you expect from your investments, and the calculator computes the required capital. <span class="highlight">Note:</span> Higher yields often come with higher risks, so diversify your investments and consult a financial advisor.</p>
+                </section>
+                <form id="calculator-form">
+                    <label for="monthly-income">Desired Monthly Income</label>
+                    <input type="number" id="monthly-income" placeholder="e.g., 1000" step="0.01">
+                    <label for="annual-yield">Expected Annual Yield (%)</label>
+                    <input type="number" id="annual-yield" placeholder="e.g., 5" step="0.01">
+                    <div class="currency-select">
+                        <button type="button" id="currency-button">USD - $</button>
+                        <div class="dropdown" id="currency-dropdown">
+                            <input type="text" id="currency-search" placeholder="Search currency">
+                            <ul id="currency-list"></ul>
+                        </div>
+                    </div>
+                    <button type="button" id="calculate-button">Calculate</button>
+                </form>
+                <div id="result"></div>
+            </main>
+            <footer>
+                <p>© 2025 Passive Income Calculator By GameNeXT</p>
+            </footer>
+        </div>
+
+        <!-- Right Ad Space -->
+        <div class="ad-space ad-right">Advertisement Right</div>
+    </div>
+
+    <!-- Embedded JavaScript -->
+    <script>
+        // Currency List (Over 100 currencies, abbreviated here for brevity)
+        const currencies = [
+            { code: "USD", symbol: "$" },
+            { code: "EUR", symbol: "€" },
+            { code: "GBP", symbol: "£" },
+            { code: "JPY", symbol: "¥" },
+            { code: "AUD", symbol: "A$" },
+            { code: "CAD", symbol: "C$" },
+            { code: "CHF", symbol: "Fr" },
+            { code: "CNY", symbol: "¥" },
+            { code: "INR", symbol: "₹" },
+            { code: "BRL", symbol: "R$" },
+            // Simulate 100+ currencies
+            ...Array.from({ length: 95 }, (_, i) => ({
+                code: `CUR${i + 1}`,
+                symbol: `C${i + 1}`
+            }))
+        ];
+
+        // Populate Currency Dropdown
+        const currencyList = document.getElementById('currency-list');
+        currencies.forEach(currency => {
+            const li = document.createElement('li');
+            li.textContent = `${currency.code} - ${currency.symbol}`;
+            li.dataset.code = currency.code;
+            li.dataset.symbol = currency.symbol;
+            currencyList.appendChild(li);
+        });
+
+        // Dropdown Functionality
+        const currencyButton = document.getElementById('currency-button');
+        const currencyDropdown = document.getElementById('currency-dropdown');
+        const currencySearch = document.getElementById('currency-search');
+        const currencySelect = document.querySelector('.currency-select');
+        let selectedSymbol = '$'; // Default to USD
+
+        currencyButton.addEventListener('click', () => {
+            currencyDropdown.classList.toggle('open');
+        });
+
+        currencySearch.addEventListener('input', () => {
+            const searchTerm = currencySearch.value.toLowerCase();
+            const items = currencyList.querySelectorAll('li');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+
+        currencyList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI') {
+                selectedSymbol = e.target.dataset.symbol;
+                currencyButton.textContent = `${e.target.dataset.code} - ${e.target.dataset.symbol}`;
+                currencyDropdown.classList.remove('open');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!currencySelect.contains(e.target)) {
+                currencyDropdown.classList.remove('open');
+            }
+        });
+
+        // Calculation Logic
+        const calculateButton = document.getElementById('calculate-button');
+        const resultDiv = document.getElementById('result');
+
+        calculateButton.addEventListener('click', () => {
+            const monthlyIncome = parseFloat(document.getElementById('monthly-income').value);
+            const annualYield = parseFloat(document.getElementById('annual-yield').value);
+
+            if (isNaN(monthlyIncome) || isNaN(annualYield) || monthlyIncome <= 0 || annualYield <= 0) {
+                resultDiv.textContent = 'Please enter valid positive numbers for income and yield.';
+                resultDiv.style.opacity = '0';
+                setTimeout(() => { resultDiv.style.opacity = '1'; }, 100);
+                return;
+            }
+
+            const annualIncome = monthlyIncome * 12;
+            const capital = annualIncome / (annualYield / 100);
+            resultDiv.style.opacity = '0';
+            setTimeout(() => {
+                resultDiv.textContent = `You need ${selectedSymbol}${capital.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} to achieve your desired passive income.`;
+                resultDiv.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
